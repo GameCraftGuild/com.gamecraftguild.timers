@@ -1,0 +1,18 @@
+{
+    "name": "GameCraftGuild.Timers.Editor",
+    "rootNamespace": "GameCraftGuild.Timers.Editor",
+    "references": [
+        "GameCraftGuild.Timers"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
