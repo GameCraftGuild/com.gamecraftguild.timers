@@ -8,6 +8,14 @@ namespace GameCraftGuild.Timers {
     /// </summary>
     public class Timekeeper : MonoBehaviour {
 
+        // TODO
+        // private struct TimerInfo {
+        //     public bool Loop;
+        //     public Action OnFinish;
+        // }
+
+        // private Dictionary<Timer, TimerInfo> _timerInfoByTimer;
+
         /// <summary>
         /// List of all the timers to be checked.
         /// </summary>
@@ -22,12 +30,23 @@ namespace GameCraftGuild.Timers {
         /// Add a timer to the timekeeper.
         /// </summary>
         /// <param name="timerToAdd">Timer to add to the timekeeper.</param>
-        public static void AddTimer (Timer timerToAdd) {
+        public static void AddTimer (Timer timerToAdd, bool loop, Action onFinish) {
             if (instance == null) {
-                CreateTimekeeper();
+                Initialize();
             }
             allTimers.Add(timerToAdd);
         }
+
+        // TODO
+        // /// <summary>
+        // /// Add a timer to the timekeeper.
+        // /// </summary>
+        // /// <param name="timerToAdd">Timer to add to the timekeeper.</param>
+        // public static AltTimer AddTimer (float durationMs, bool loop, Action onFinish) {
+        //     AltTimer timer = new AltTimer(durationMs);
+        //     AddTimer(timer, loop, onFinish);
+        //     return timer;
+        // }
 
         /// <summary>
         /// Remove a timer from the timekeeper.
@@ -41,7 +60,8 @@ namespace GameCraftGuild.Timers {
         /// <summary>
         /// Create an instance of the timekeeper.
         /// </summary>
-        private static void CreateTimekeeper () {
+        public static void Initialize () {
+            if (instance != null) return;
             GameObject tempGameObject = new GameObject();
             tempGameObject.name = "TimeKeeper";
             tempGameObject.AddComponent<Timekeeper>();
