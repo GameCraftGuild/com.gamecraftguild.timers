@@ -10,10 +10,12 @@ public class ChangeScenes : MonoBehaviour {
 
     // Start is called before the first frame update
     void Start () {
-        changeTimer = TimerFactory.CreateManagedTimer(35, false);
-        changeTimer.AddOnFinishAction(ChangeScene);
+        // changeTimer = TimerFactory.CreateManagedTimer(35, false);
+        // changeTimer.AddOnFinishAction(ChangeScene);
 
-        changeTimer.StartTimer();
+        // changeTimer.StartTimer();
+        changeTimer = Timekeeper.AddTimer(35, ChangeScene, false);
+        Timekeeper.StartTimer(changeTimer);
     }
 
     // Update is called once per frame
@@ -23,5 +25,9 @@ public class ChangeScenes : MonoBehaviour {
 
     private void ChangeScene () {
         SceneManager.LoadScene("TestScene2");
+    }
+
+    void OnDestroy () {
+        Timekeeper.RemoveTimer(changeTimer);
     }
 }

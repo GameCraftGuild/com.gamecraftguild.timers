@@ -17,25 +17,17 @@ public class MakeTimers : MonoBehaviour {
 
     // Start is called before the first frame update
     void Start () {
-        t1 = TimerFactory.CreateManagedTimer(1, true);
-        t1.AddOnFinishAction(EverySecond);
 
-        t5 = TimerFactory.CreateManagedTimer(5, true);
-        t5.AddOnFinishAction(EveryFiveSeconds);
+        t1 = Timekeeper.AddTimer(1, EverySecond, true);
+        t5 = Timekeeper.AddTimer(5, EveryFiveSeconds, true);
+        t10 = Timekeeper.AddTimer(10, OnceOffTenSeconds);
+        t15 = Timekeeper.AddTimer(15, OnceOffFifteenSeconds);
 
-        t10 = TimerFactory.CreateManagedTimer(10, false);
-        t10.AddOnFinishAction(OnceOffTenSeconds);
+        Timekeeper.StartTimer(t1);
+        Timekeeper.StartTimer(t5);
+        Timekeeper.StartTimer(t10);
+        Timekeeper.StartTimer(t15);
 
-        t15 = TimerFactory.CreateManagedTimer(15, false);
-        t15.AddOnFinishAction(OnceOffFifteenSeconds);
-
-        t2 = TimerFactory.CreateTimer(2, true);
-
-        t1.StartTimer();
-        t5.StartTimer();
-        t10.StartTimer();
-        t15.StartTimer();
-        t2.StartTimer();
     }
 
     // Update is called once per frame
@@ -43,12 +35,11 @@ public class MakeTimers : MonoBehaviour {
 
     }
 
-    void FixedUpdate () {
-        t2.CheckTime();
-    }
-
-    void OnDisable () {
+    void OnDestroy () {
         Timekeeper.RemoveTimer(t1);
+        Timekeeper.RemoveTimer(t5);
+        Timekeeper.RemoveTimer(t10);
+        Timekeeper.RemoveTimer(t15);
     }
 
     public void EverySecond () {

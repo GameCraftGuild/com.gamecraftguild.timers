@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace GameCraftGuild.Timers {
@@ -8,18 +10,13 @@ namespace GameCraftGuild.Timers {
     /// </summary>
     public class Timekeeper : MonoBehaviour {
 
-        // TODO
-        // private struct TimerInfo {
-        //     public bool Loop;
-        //     public Action OnFinish;
-        // }
+        private struct TimerInfo {
+            public bool Loop;
+            public bool UseUnscaledTime;
+            public Action OnFinish;
+        }
 
-        // private Dictionary<Timer, TimerInfo> _timerInfoByTimer;
-
-        /// <summary>
-        /// List of all the timers to be checked.
-        /// </summary>
-        private static List<Timer> allTimers = new List<Timer>();
+        private static Dictionary<Timer, TimerInfo> _timerInfoByTimer = new Dictionary<Timer, TimerInfo>();
 
         /// <summary>
         /// Static reference to the single timekeeper instance.
@@ -29,24 +26,77 @@ namespace GameCraftGuild.Timers {
         /// <summary>
         /// Add a timer to the timekeeper.
         /// </summary>
-        /// <param name="timerToAdd">Timer to add to the timekeeper.</param>
-        public static void AddTimer (Timer timerToAdd, bool loop, Action onFinish) {
+        /// <param name="durationMs">Duration for the timer.</param>
+        /// <param name="loop">Should the timer loop.</param>
+        /// <param name="onFinish">Action to perform when the timer finishes.</param>
+        /// <returns>The timer.</returns>
+        public static Timer AddTimer (float durationMs, Action onFinish, bool loop = false, bool useUnscaledTime = false) {
             if (instance == null) {
                 Initialize();
             }
-            allTimers.Add(timerToAdd);
+
+            Timer timer = new Timer(durationMs);
+            _timerInfoByTimer.Add(timer, new TimerInfo() { Loop = loop, UseUnscaledTime = useUnscaledTime, OnFinish = onFinish });
+            return timer;
         }
 
-        // TODO
-        // /// <summary>
-        // /// Add a timer to the timekeeper.
-        // /// </summary>
-        // /// <param name="timerToAdd">Timer to add to the timekeeper.</param>
-        // public static AltTimer AddTimer (float durationMs, bool loop, Action onFinish) {
-        //     AltTimer timer = new AltTimer(durationMs);
-        //     AddTimer(timer, loop, onFinish);
-        //     return timer;
-        // }
+        /// <summary>
+        /// Start the <paramref name="timer" />.
+        /// </summary>
+        /// <param name="timer">Timer to start.</param>
+        public static void StartTimer (Timer timer) {
+            timer.Start(GetTimeType(timer));
+        }
+
+        /// <summary>
+        /// Stop the <paramref name="timer" />.
+        /// </summary>
+        /// <param name="timer">Timer to stop.</param>
+        public static void StopTimer (Timer timer) {
+            timer.Stop();
+        }
+
+        /// <summary>
+        /// Restart the <paramref name="timer" />.
+        /// </summary>
+        /// <param name="timer">Timer to restart.</param>
+        public static void RestartTimer (Timer timer) {
+            timer.Restart(GetTimeType(timer));
+        }
+
+        /// <summary>
+        /// Pause the <paramref name="timer" />.
+        /// </summary>
+        /// <param name="timer">Timer to pause.</param>
+        public static void PauseTimer (Timer timer) {
+            timer.Pause(GetTimeType(timer));
+        }
+
+        /// <summary>
+        /// Unpause the <paramref name="timer" />.
+        /// </summary>
+        /// <param name="timer">Timer to unpause.</param>
+        public static void UnpauseTimer (Timer timer) {
+            timer.Unpause(GetTimeType(timer));
+        }
+
+        /// <summary>
+        /// Get the percentage complete for the timer. <paramref name="timer" />.
+        /// </summary>
+        /// <param name="timer">Timer to get the percent complete for.</param>
+        /// <returns>The percentage complete for the timer as a float between 0 and 1 inclusive.</returns>
+        public static float GetPercentComplete (Timer timer) {
+            return timer.PercentComplete(GetTimeType(timer));
+        }
+
+        /// <summary>
+        /// Get either the time or the unscaled time based on the <paramref name="timer" />'s TimerInfo.
+        /// </summary>
+        /// <param name="timer">The timer to get the time for.</param>
+        /// <returns>Either the time or unscaled time based on <paramref name="timer" />.</returns>
+        private static float GetTimeType (Timer timer) {
+            return _timerInfoByTimer[timer].UseUnscaledTime ? Time.unscaledTime : Time.time;
+        }
 
         /// <summary>
         /// Remove a timer from the timekeeper.
@@ -54,7 +104,7 @@ namespace GameCraftGuild.Timers {
         /// <param name="timerToRemove">Timer to remove from the timekeeper.</param>
         /// <returns>If <paramref name="timerToRemove" /> was removed successfully.</returns>
         public static bool RemoveTimer (Timer timerToRemove) {
-            return allTimers.Remove(timerToRemove);
+            return _timerInfoByTimer.Remove(timerToRemove);
         }
 
         /// <summary>
@@ -71,10 +121,16 @@ namespace GameCraftGuild.Timers {
         }
 
         /// <summary>
-        /// Called at a fixed time interval. Checks the time on all the timers.
+        /// Called at a fixed time interval. Checks the time on all the timers. Timers are checked in the order they have been added.
         /// </summary>
         private void FixedUpdate () {
-            allTimers.ForEach(timer => timer.CheckTime());
+            foreach (KeyValuePair<Timer, TimerInfo> timer in _timerInfoByTimer) {
+                if (timer.Key.IsComplete(GetTimeType(timer.Key))) {
+                    timer.Key.Stop();
+                    timer.Value.OnFinish();
+                    if (timer.Value.Loop) timer.Key.Restart(GetTimeType(timer.Key));
+                }
+            }
         }
 
     }
