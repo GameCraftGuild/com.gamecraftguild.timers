@@ -44,7 +44,7 @@ namespace GameCraftGuild.Timers {
             if (!_paused) return;
 
             _paused = false;
-            float durationPausedMs = _pausedTimeMs - currentTime;
+            float durationPausedMs = currentTime - _pausedTimeMs;
             _completeTimeMs += durationPausedMs;
         }
 

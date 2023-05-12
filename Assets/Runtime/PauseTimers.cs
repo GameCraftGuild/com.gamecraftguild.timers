@@ -6,36 +6,48 @@ using UnityEngine;
 public class PauseTimers : MonoBehaviour {
 
     Timer pausedTimer;
+    Timer pauseControl1;
+    Timer unpauseControl1;
+    Timer pauseControl2;
+    Timer unpauseControl2;
 
     Timer stoppedTimer;
+    Timer stopControl;
+    Timer startControl;
 
     Timer restartedTimer;
+    Timer restartControl;
 
-    Timer controlTimer;
 
-    Timer startingTimer;
+
 
     // Start is called before the first frame update
     void Start () {
-        // pausedTimer = TimerFactory.CreateManagedTimer(10, true);
-        // pausedTimer.AddOnFinishAction(() => DebugWithTime("15s PausedTimer: "));
+        pausedTimer = Timekeeper.AddTimer(7, () => DebugWithTime("Paused Timer Complete (@13s): "));
+        pauseControl1 = Timekeeper.AddTimer(3, () => PauseTimer(pausedTimer));
+        unpauseControl1 = Timekeeper.AddTimer(6, () => UnpauseTimer(pausedTimer));
+        pauseControl2 = Timekeeper.AddTimer(9, () => PauseTimer(pausedTimer));
+        unpauseControl2 = Timekeeper.AddTimer(12, () => UnpauseTimer(pausedTimer));
 
-        // stoppedTimer = TimerFactory.CreateManagedTimer(10, true);
-        // stoppedTimer.AddOnFinishAction(() => DebugWithTime("17s StoppedTimer: "));
+        stoppedTimer = Timekeeper.AddTimer(6, () => DebugWithTime("Stopped Timer Complete (@10s): "));
+        stopControl = Timekeeper.AddTimer(2, () => StopTimer(stoppedTimer));
+        startControl = Timekeeper.AddTimer(4, () => StartTimer(stoppedTimer));
 
-        // restartedTimer = TimerFactory.CreateManagedTimer(10, true);
-        // restartedTimer.AddOnFinishAction(() => DebugWithTime("13s RestartedTimer: "));
+        restartedTimer = Timekeeper.AddTimer(4, () => DebugWithTime("Restarted Timer Complete (@7s): "));
+        restartControl = Timekeeper.AddTimer(3, () => RestartTimer(restartedTimer));
 
-        // controlTimer = TimerFactory.CreateManagedTimer(3, true);
-        // controlTimer.AddOnFinishAction(Stopping);
+        Timekeeper.StartTimer(pausedTimer);
+        Timekeeper.StartTimer(pauseControl1);
+        Timekeeper.StartTimer(unpauseControl1);
+        Timekeeper.StartTimer(pauseControl2);
+        Timekeeper.StartTimer(unpauseControl2);
 
-        // startingTimer = TimerFactory.CreateManagedTimer(4, false);
-        // startingTimer.AddOnFinishAction(Starting);
+        Timekeeper.StartTimer(stoppedTimer);
+        Timekeeper.StartTimer(stopControl);
+        Timekeeper.StartTimer(startControl);
 
-        // pausedTimer.StartTimer();
-        // stoppedTimer.StartTimer();
-        // restartedTimer.StartTimer();
-        // controlTimer.StartTimer();
+        Timekeeper.StartTimer(restartedTimer);
+        Timekeeper.StartTimer(restartControl);
     }
 
     // Update is called once per frame
@@ -47,40 +59,26 @@ public class PauseTimers : MonoBehaviour {
         Debug.Log(s + Time.time);
     }
 
-    // private void Stopping () {
-    //     DebugWithTime("3s Stopping: ");
-    //     controlTimer.AddOnFinishAction(Starting);
-    //     controlTimer.RemoveOnFinishAction(Stopping);
-    //     controlTimer.SetDuration(4);
+    private void PauseTimer (Timer t) {
+        Timekeeper.PauseTimer(t);
+        DebugWithTime("Pausing at: ");
+    }
 
-    //     pausedTimer.PauseTimer();
-    //     stoppedTimer.StopTimer();
-    //     restartedTimer.RestartTimer();
-    // }
+    private void UnpauseTimer (Timer t) {
+        Timekeeper.UnpauseTimer(t);
+        DebugWithTime("Unpausing at: ");
+    }
 
-    // private void Starting () {
-    //     DebugWithTime("7s Starting: ");
-    //     controlTimer.AddOnFinishAction(SecondPause);
-    //     controlTimer.RemoveOnFinishAction(Starting);
-    //     controlTimer.SetDuration(1);
+    private void StopTimer (Timer t) {
+        Timekeeper.StopTimer(t);
+    }
 
-    //     pausedTimer.StartTimer();
-    //     stoppedTimer.StartTimer();
-    // }
+    private void StartTimer (Timer t) {
+        Timekeeper.StartTimer(t);
+    }
 
-    // private void SecondPause () {
-    //     DebugWithTime("8s SecondPause: ");
-    //     controlTimer.AddOnFinishAction(SecondStart);
-    //     controlTimer.RemoveOnFinishAction(SecondPause);
-
-    //     pausedTimer.PauseTimer();
-    // }
-
-    // private void SecondStart () {
-    //     DebugWithTime("9s SecondStart: ");
-    //     controlTimer.StopTimer();
-
-    //     pausedTimer.StartTimer();
-    // }
+    private void RestartTimer (Timer t) {
+        Timekeeper.RestartTimer(t);
+    }
 
 }
