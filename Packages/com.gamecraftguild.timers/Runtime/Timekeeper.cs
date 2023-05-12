@@ -26,16 +26,16 @@ namespace GameCraftGuild.Timers {
         /// <summary>
         /// Add a timer to the timekeeper.
         /// </summary>
-        /// <param name="durationMs">Duration for the timer.</param>
+        /// <param name="duration">Duration for the timer.</param>
         /// <param name="loop">Should the timer loop.</param>
         /// <param name="onFinish">Action to perform when the timer finishes.</param>
         /// <returns>The timer.</returns>
-        public static Timer AddTimer (float durationMs, Action onFinish, bool loop = false, bool useUnscaledTime = false) {
+        public static Timer AddTimer (float duration, Action onFinish, bool loop = false, bool useUnscaledTime = false) {
             if (instance == null) {
                 Initialize();
             }
 
-            Timer timer = new Timer(durationMs);
+            Timer timer = new Timer(duration);
             _timerInfoByTimer.Add(timer, new TimerInfo() { Loop = loop, UseUnscaledTime = useUnscaledTime, OnFinish = onFinish });
             return timer;
         }

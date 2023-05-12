@@ -1,58 +1,94 @@
 namespace GameCraftGuild.Timers {
 
+    /// <summary>
+    /// Timer class.
+    /// </summary>
     public class Timer {
-        private float _durationMs;
-        private float _completeTimeMs;
-        private float _pausedTimeMs;
+        private float _duration;
+        private float _completeTime;
+        private float _pausedTime;
         private bool _started = false;
         private bool _paused = false;
 
-        public Timer (float durationMs) {
-            _durationMs = durationMs;
+        /// <summary>
+        /// Create a new timer with the given <paramref name="duration" />.
+        /// </summary>
+        /// <param name="duration">Duration for the timer.</param>
+        public Timer (float duration) {
+            _duration = duration;
         }
 
+        /// <summary>
+        /// Has the timer run for it's duration at the <paramref name="currentTime" />.
+        /// </summary>
+        /// <param name="currentTime">Time to check the timer at.</param>
+        /// <returns>True if the timer is complete at the <paramref name="currentTime" /> and false otherwise.</returns>
         public bool IsComplete (float currentTime) {
-            return _started && !_paused && currentTime >= _completeTimeMs;
+            return _started && !_paused && currentTime >= _completeTime;
         }
 
+        /// <summary>
+        /// Start the timer at the <paramref name="currentTime" />.
+        /// </summary>
+        /// <param name="currentTime">Time to start the timer at.</param>
         public void Start (float currentTime) {
             if (_started) return;
 
             _started = true;
-            _completeTimeMs = currentTime + _durationMs;
+            _completeTime = currentTime + _duration;
         }
 
+        /// <summary>
+        /// Stop the timer.
+        /// </summary>
         public void Stop () {
             _started = false;
             _paused = false;
         }
 
+        /// <summary>
+        /// Restart the timer at the <paramref name="currentTime" />.
+        /// </summary>
+        /// <param name="currentTime">Time to restart the timer at.</param>
         public void Restart (float currentTime) {
             Stop();
             Start(currentTime);
         }
 
+        /// <summary>
+        /// Pause the timer at the <paramref name="currentTime" />
+        /// </summary>
+        /// <param name="currentTime">Time to pause the timer at.</param>
         public void Pause (float currentTime) {
             if (_paused) return;
 
             _paused = true;
-            _pausedTimeMs = currentTime;
+            _pausedTime = currentTime;
 
         }
 
+        /// <summary>
+        /// Unpause the timer at the <paramref name="currentTime" />.
+        /// </summary>
+        /// <param name="currentTime">Time to unpause the timer at.</param>
         public void Unpause (float currentTime) {
             if (!_paused) return;
 
             _paused = false;
-            float durationPausedMs = currentTime - _pausedTimeMs;
-            _completeTimeMs += durationPausedMs;
+            float durationPaused = currentTime - _pausedTime;
+            _completeTime += durationPaused;
         }
 
+        /// <summary>
+        /// Get the percentage complete for the timer at the <paramref name="currentTime" /> as a float between 0 and 1.
+        /// </summary>
+        /// <param name="currentTime">The time to get the percentage complete at.</param>
+        /// <returns>A float between 0 and 1 representing the percentage complete </returns>
         public float PercentComplete (float currentTime) {
             if (!_started) return 0f;
-            if (_paused) return (_durationMs - (_completeTimeMs - _pausedTimeMs)) / _durationMs;
+            if (_paused) return (_duration - (_completeTime - _pausedTime)) / _duration;
 
-            return (_durationMs - (_completeTimeMs - currentTime)) / _durationMs;
+            return (_duration - (_completeTime - currentTime)) / _duration;
         }
     }
 }
