@@ -28,6 +28,30 @@ namespace GameCraftGuild.Timers {
         }
 
         /// <summary>
+        /// Is the timer currently running.
+        /// </summary>
+        /// <returns>True if the timer is started and not paused.</returns>
+        public bool IsRunning () {
+            return _started && !_paused;
+        } 
+
+        /// <summary>
+        /// Is the timer started.
+        /// </summary>
+        /// <returns>True if the timer is started.</returns>
+        public bool IsStarted () {
+            return _started;
+        }
+
+        /// <summary>
+        /// Is the timer paused.
+        /// </summary>
+        /// <returns>True if the timer is paused.</returns>
+        public bool IsPaused () {
+            return _paused;
+        }
+
+        /// <summary>
         /// Start the timer at the <paramref name="currentTime" />.
         /// </summary>
         /// <param name="currentTime">Time to start the timer at.</param>
