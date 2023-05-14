@@ -18,7 +18,8 @@ public class PauseTimers : MonoBehaviour {
     Timer restartedTimer;
     Timer restartControl;
 
-
+    Timer stoppedNoStartTimer;
+    Timer stoppedNoStartControl;
 
 
     // Start is called before the first frame update
@@ -36,6 +37,9 @@ public class PauseTimers : MonoBehaviour {
         restartedTimer = Timekeeper.AddTimer(4, () => DebugWithTime("Restarted Timer Complete (@7s): "));
         restartControl = Timekeeper.AddTimer(3, () => RestartTimer(restartedTimer));
 
+        stoppedNoStartTimer = Timekeeper.AddTimer(5, () => Debug.Log("This should never be called."), true);
+        stoppedNoStartControl = Timekeeper.AddTimer(3, () => StopTimer(stoppedNoStartTimer));
+
         Timekeeper.StartTimer(pausedTimer);
         Timekeeper.StartTimer(pauseControl1);
         Timekeeper.StartTimer(unpauseControl1);
@@ -48,6 +52,9 @@ public class PauseTimers : MonoBehaviour {
 
         Timekeeper.StartTimer(restartedTimer);
         Timekeeper.StartTimer(restartControl);
+
+        Timekeeper.StartTimer(stoppedNoStartTimer);
+        Timekeeper.StartTimer(stoppedNoStartControl);
     }
 
     // Update is called once per frame

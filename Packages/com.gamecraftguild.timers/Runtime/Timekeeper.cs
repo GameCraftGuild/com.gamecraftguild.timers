@@ -30,7 +30,7 @@ namespace GameCraftGuild.Timers {
         /// <param name="loop">Should the timer loop.</param>
         /// <param name="onFinish">Action to perform when the timer finishes.</param>
         /// <returns>The timer.</returns>
-        public static Timer AddTimer (float duration, Action onFinish, bool loop = false, bool useUnscaledTime = false) {
+        public static Timer AddTimer(float duration, Action onFinish, bool loop = false, bool useUnscaledTime = false) {
             if (instance == null) {
                 Initialize();
             }
@@ -44,7 +44,7 @@ namespace GameCraftGuild.Timers {
         /// Start the <paramref name="timer" />.
         /// </summary>
         /// <param name="timer">Timer to start.</param>
-        public static void StartTimer (Timer timer) {
+        public static void StartTimer(Timer timer) {
             timer.Start(GetTimeType(timer));
         }
 
@@ -52,7 +52,7 @@ namespace GameCraftGuild.Timers {
         /// Stop the <paramref name="timer" />.
         /// </summary>
         /// <param name="timer">Timer to stop.</param>
-        public static void StopTimer (Timer timer) {
+        public static void StopTimer(Timer timer) {
             timer.Stop();
         }
 
@@ -60,7 +60,7 @@ namespace GameCraftGuild.Timers {
         /// Restart the <paramref name="timer" />.
         /// </summary>
         /// <param name="timer">Timer to restart.</param>
-        public static void RestartTimer (Timer timer) {
+        public static void RestartTimer(Timer timer) {
             timer.Restart(GetTimeType(timer));
         }
 
@@ -68,7 +68,7 @@ namespace GameCraftGuild.Timers {
         /// Pause the <paramref name="timer" />.
         /// </summary>
         /// <param name="timer">Timer to pause.</param>
-        public static void PauseTimer (Timer timer) {
+        public static void PauseTimer(Timer timer) {
             timer.Pause(GetTimeType(timer));
         }
 
@@ -76,7 +76,7 @@ namespace GameCraftGuild.Timers {
         /// Unpause the <paramref name="timer" />.
         /// </summary>
         /// <param name="timer">Timer to unpause.</param>
-        public static void UnpauseTimer (Timer timer) {
+        public static void UnpauseTimer(Timer timer) {
             timer.Unpause(GetTimeType(timer));
         }
 
@@ -85,7 +85,7 @@ namespace GameCraftGuild.Timers {
         /// </summary>
         /// <param name="timer">Timer to get the percent complete for.</param>
         /// <returns>The percentage complete for the timer as a float between 0 and 1 inclusive.</returns>
-        public static float GetPercentComplete (Timer timer) {
+        public static float GetPercentComplete(Timer timer) {
             return timer.PercentComplete(GetTimeType(timer));
         }
 
@@ -94,7 +94,7 @@ namespace GameCraftGuild.Timers {
         /// </summary>
         /// <param name="timer">The timer to get the time for.</param>
         /// <returns>Either the time or unscaled time based on <paramref name="timer" />.</returns>
-        private static float GetTimeType (Timer timer) {
+        private static float GetTimeType(Timer timer) {
             return _timerInfoByTimer[timer].UseUnscaledTime ? Time.unscaledTime : Time.time;
         }
 
@@ -103,14 +103,14 @@ namespace GameCraftGuild.Timers {
         /// </summary>
         /// <param name="timerToRemove">Timer to remove from the timekeeper.</param>
         /// <returns>If <paramref name="timerToRemove" /> was removed successfully.</returns>
-        public static bool RemoveTimer (Timer timerToRemove) {
+        public static bool RemoveTimer(Timer timerToRemove) {
             return _timerInfoByTimer.Remove(timerToRemove);
         }
 
         /// <summary>
         /// Create an instance of the timekeeper.
         /// </summary>
-        public static void Initialize () {
+        public static void Initialize() {
             if (instance != null) return;
             GameObject tempGameObject = new GameObject();
             tempGameObject.name = "TimeKeeper";
@@ -123,12 +123,17 @@ namespace GameCraftGuild.Timers {
         /// <summary>
         /// Called at a fixed time interval. Checks the time on all the timers. Timers are checked in the order they have been added.
         /// </summary>
-        private void FixedUpdate () {
+        private void FixedUpdate() {
             foreach (KeyValuePair<Timer, TimerInfo> timer in _timerInfoByTimer) {
                 if (timer.Key.IsComplete(GetTimeType(timer.Key))) {
-                    timer.Key.Stop();
+
                     timer.Value.OnFinish();
-                    if (timer.Value.Loop) timer.Key.Restart(GetTimeType(timer.Key));
+
+                    if (timer.Value.Loop && timer.Key.IsComplete(GetTimeType(timer.Key))) {
+                        timer.Key.Restart(GetTimeType(timer.Key));
+                    } else {
+                        timer.Key.Stop();
+                    }
                 }
             }
         }
