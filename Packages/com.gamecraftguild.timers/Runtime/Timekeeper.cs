@@ -18,6 +18,12 @@ namespace GameCraftGuild.Timers {
 
         private static Dictionary<Timer, TimerInfo> _timerInfoByTimer = new Dictionary<Timer, TimerInfo>();
 
+        private static Timer stopCurrentLoop;
+
+        private static bool checkingTime;
+
+        private static List<Timer> timersToRemove = new List<Timer>();
+
         /// <summary>
         /// Static reference to the single timekeeper instance.
         /// </summary>
@@ -49,11 +55,12 @@ namespace GameCraftGuild.Timers {
         }
 
         /// <summary>
-        /// Stop the <paramref name="timer" />.
+        /// Stop the <paramref name="timer" />. If this is called during the OnFinish action of a timer where Loop == true, it will prevent the timer from restarting.
         /// </summary>
         /// <param name="timer">Timer to stop.</param>
         public static void StopTimer(Timer timer) {
             timer.Stop();
+            stopCurrentLoop = timer;
         }
 
         /// <summary>
@@ -99,12 +106,15 @@ namespace GameCraftGuild.Timers {
         }
 
         /// <summary>
-        /// Remove a timer from the timekeeper.
+        /// Remove a timer from the timekeeper. If this is called during an OnFinish action, the timer will be queued to be removed once all time checks have completed.
         /// </summary>
         /// <param name="timerToRemove">Timer to remove from the timekeeper.</param>
-        /// <returns>If <paramref name="timerToRemove" /> was removed successfully.</returns>
-        public static bool RemoveTimer(Timer timerToRemove) {
-            return _timerInfoByTimer.Remove(timerToRemove);
+        public static void RemoveTimer(Timer timerToRemove) {
+            if (!checkingTime) {
+                _timerInfoByTimer.Remove(timerToRemove);
+            } else {
+                timersToRemove.Add(timerToRemove);
+            }
         }
 
         /// <summary>
@@ -121,21 +131,35 @@ namespace GameCraftGuild.Timers {
         }
 
         /// <summary>
+        /// Remove timers that were queued to be removed.
+        /// </summary>
+        private static void RemoveQueuedTimers () {
+            foreach (Timer t in timersToRemove) RemoveTimer(t);
+
+            timersToRemove.Clear();
+        }
+
+        /// <summary>
         /// Called at a fixed time interval. Checks the time on all the timers. Timers are checked in the order they have been added.
         /// </summary>
         private void FixedUpdate() {
+            checkingTime = true;
             foreach (KeyValuePair<Timer, TimerInfo> timer in _timerInfoByTimer) {
+                stopCurrentLoop = null;
                 if (timer.Key.IsComplete(GetTimeType(timer.Key))) {
 
                     timer.Value.OnFinish();
 
-                    if (timer.Value.Loop && timer.Key.IsComplete(GetTimeType(timer.Key))) {
+                    if (timer.Value.Loop && stopCurrentLoop != timer.Key) { // if the current timer was stopped in OnFinish, don't restart it.
                         timer.Key.Restart(GetTimeType(timer.Key));
                     } else {
                         timer.Key.Stop();
                     }
+
                 }
             }
+            checkingTime = false;
+            RemoveQueuedTimers();
         }
 
     }
