@@ -142,7 +142,7 @@ namespace GameCraftGuild.Timers {
         /// <summary>
         /// Called at a fixed time interval. Checks the time on all the timers. Timers are checked in the order they have been added.
         /// </summary>
-        private void FixedUpdate() {
+        private void Update() {
             checkingTime = true;
             foreach (KeyValuePair<Timer, TimerInfo> timer in _timerInfoByTimer) {
                 stopCurrentLoop = null;
